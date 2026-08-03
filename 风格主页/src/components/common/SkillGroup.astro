@@ -1,0 +1,33 @@
+---
+const { name, skills } = Astro.props as { name: string; skills: string[] };
+---
+
+<article class="skill card">
+  <h3>{name}</h3><div>
+    {skills.map((skill) => <span class="tag">{skill}</span>)}
+  </div>
+</article>
+<style>
+  .skill {
+    grid-column: span 3;
+    padding: 1.25rem;
+  }
+  .skill h3 {
+    margin-bottom: 1rem;
+  }
+  .skill div {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 900px) {
+    .skill {
+      grid-column: span 6;
+    }
+  }
+  @media (max-width: 520px) {
+    .skill {
+      grid-column: 1/-1;
+    }
+  }
+</style>

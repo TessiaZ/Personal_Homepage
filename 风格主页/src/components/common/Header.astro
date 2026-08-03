@@ -1,0 +1,197 @@
+---
+import type { Locale } from "@/types";
+import { navigation } from "@/data/navigation";
+import { localePath } from "@/i18n";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const current = Astro.url.pathname.split("/").filter(Boolean)[1] ?? "";
+---
+
+<header class="site-header" id="site-header">
+  <div class="header-inner container">
+    <a
+      class="brand"
+      href={localePath(locale)}
+      aria-label={locale === "zh" ? "返回首页" : "Back to home"}
+      ><span>QZ</span><strong>Qinghe Zhang</strong></a
+    >
+    <nav
+      class="desktop-nav"
+      aria-label={locale === "zh" ? "主导航" : "Main navigation"}
+    >
+      {
+        navigation.map((item) => (
+          <a
+            href={localePath(locale, item.path)}
+            aria-current={current === item.path ? "page" : undefined}
+          >
+            {item[locale]}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="tools">
+      <LanguageSwitcher locale={locale} /><ThemeToggle /><button
+        id="menu-toggle"
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        ><span class="sr-only">Menu</span><span aria-hidden="true">☰</span
+        ></button>
+    </div>
+  </div>
+  <nav
+    id="mobile-menu"
+    class="mobile-menu"
+    aria-label={locale === "zh" ? "移动端导航" : "Mobile navigation"}
+    hidden
+  >
+    <div class="container">
+      {
+        navigation.map((item) => (
+          <a
+            href={localePath(locale, item.path)}
+            aria-current={current === item.path ? "page" : undefined}
+          >
+            {item[locale]}
+          </a>
+        ))
+      }
+    </div>
+  </nav>
+</header>
+<script>
+  const header = document.querySelector("#site-header");
+  const btn = document.querySelector<HTMLButtonElement>("#menu-toggle");
+  const menu = document.querySelector<HTMLElement>("#mobile-menu");
+  const syncHeader = () =>
+    header?.classList.toggle("scrolled", window.scrollY > 8);
+  syncHeader();
+  addEventListener("scroll", syncHeader, { passive: true });
+  btn?.addEventListener("click", () => {
+    const open = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!open));
+    if (menu) menu.hidden = open;
+  });
+</script>
+<style>
+  .site-header {
+    position: sticky;
+    z-index: 50;
+    top: 0;
+    background: color-mix(in srgb, var(--color-background) 88%, transparent);
+    backdrop-filter: blur(14px);
+    transition: border-color 0.2s;
+  }
+  .site-header.scrolled {
+    border-bottom: 1px solid var(--color-border);
+  }
+  .header-inner {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-right: auto;
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+  .brand span {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.72rem;
+  }
+  .brand strong {
+    font-size: 0.95rem;
+  }
+  .desktop-nav {
+    display: flex;
+    gap: 1.35rem;
+  }
+  .desktop-nav a {
+    position: relative;
+    color: var(--color-text-secondary);
+    font-size: 0.88rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .desktop-nav a[aria-current="page"],
+  .desktop-nav a:hover {
+    color: var(--color-accent);
+  }
+  .desktop-nav a[aria-current="page"]::after {
+    content:"";
+    position:absolute;
+    left:12%;
+    right:8%;
+    bottom:-.35rem;
+    height:2px;
+    background:var(--color-accent);
+    transform:rotate(-2deg);
+  }
+  .desktop-nav a { transition:transform var(--motion-fast),color var(--motion-fast); }
+  .desktop-nav a:hover { transform:translateY(-2px); }
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .menu-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+  .mobile-menu {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .mobile-menu .container {
+    display: grid;
+    padding-block: 0.65rem 1rem;
+  }
+  .mobile-menu a {
+    padding: 0.65rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+  .mobile-menu a[aria-current="page"] {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+  @media (max-width: 900px) {
+    .desktop-nav {
+      display: none;
+    }
+    .menu-toggle {
+      display: block;
+    }
+    .brand strong {
+      display: none;
+    }
+  }
+  @media (max-width:520px) {
+    .header-inner { gap:.6rem; }
+    .brand { margin-right:auto; }
+    .tools { gap:.25rem; }
+    .tools :global(button), .tools :global(a), .menu-toggle { width:40px; min-width:40px; padding-inline:0; }
+  }
+  @media(prefers-reduced-motion:reduce){.desktop-nav a:hover{transform:none}}
+</style>

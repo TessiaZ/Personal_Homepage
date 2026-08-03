@@ -1,0 +1,39 @@
+---
+import type { Locale } from "@/types";
+import { posts } from "@/data/posts";
+import { profile } from "@/data/profile";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/common/PageHeader.astro";
+import BlogCard from "@/components/common/BlogCard.astro";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+
+<BaseLayout
+  {locale}
+  title={`${zh ? "文章" : "Writing"} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={zh
+    ? "研究笔记、工程实践和 AI 产品思考。"
+    : "Notes on research, engineering, and AI products."}
+  ><PageHeader
+    eyebrow="Writing"
+    title={zh ? "把过程写清楚" : "Making the process legible"}
+    description={zh
+      ? "记录研究中的判断、工程里的失败，以及产品设计中的取舍。"
+      : "Notes on research decisions, engineering failures, and product trade-offs."}
+  /><section class="section">
+    <div class="container">
+      <div class="grid">
+        {
+          posts.length ? (
+            posts
+              .sort((a, b) => b.date.localeCompare(a.date))
+              .map((post) => <BlogCard {post} {locale} />)
+          ) : (
+            <div class="empty card">{zh ? "暂无文章" : "No posts yet"}</div>
+          )
+        }
+      </div>
+    </div>
+  </section></BaseLayout
+>

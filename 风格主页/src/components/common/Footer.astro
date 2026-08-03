@@ -1,0 +1,36 @@
+---
+import type { Locale } from "@/types";
+import { profile } from "@/data/profile";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+<footer>
+  <div class="container footer-poster">
+    <p class="eyebrow">{zh ? "保持联系" : "Keep in touch"}</p>
+    <h2>{zh ? <><span>一起把有意义的想法</span><span>做成真实的东西。</span></> : <><span>LET’S BUILD</span><span>SOMETHING MEANINGFUL.</span></>}</h2>
+    <div class="footer-actions">
+      <a class="mail" href={`mailto:${profile.email}`}>{profile.email} <span aria-hidden="true">↗</span></a>
+      <nav aria-label={zh ? "页脚链接" : "Footer links"}>
+        <a href={profile.github}>GitHub</a><a href={profile.scholar}>Scholar</a><a href={profile.linkedin}>LinkedIn</a>
+      </nav>
+    </div>
+    <a class="to-top" href="#top">{zh ? "返回顶部" : "Back to top"} ↑</a>
+    <div class="footer-bottom"><span>{zh ? profile.nameZh : profile.nameEn}</span><span>© {new Date().getFullYear()} · MIT License</span></div>
+  </div>
+</footer>
+<style>
+  footer { position:relative; overflow:hidden; padding:clamp(4rem,8vw,7rem) 0 2rem; background:#124f40; color:#f8f2df; }
+  .footer-poster { position:relative; }
+  footer .eyebrow { color:#b8dbc8; }
+  h2 { max-width:930px; font-size:clamp(2.8rem,7vw,6.6rem); line-height:.92; letter-spacing:-.055em; }
+  h2 span { display:block; }
+  .footer-actions { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:end; gap:2rem; margin-top:clamp(2rem,5vw,4rem); }
+  footer a { color:#f8f2df; }
+  footer a:hover { color:#d6efdf; }
+  .mail { font-size:clamp(1.05rem,2vw,1.35rem); font-weight:800; }
+  .mail span { display:inline-block; animation:drift-horizontal 5.6s var(--ease-standard) infinite alternate; }
+  nav { display:flex; flex-wrap:wrap; gap:1.2rem; }
+  .to-top { position:absolute; z-index:2; right:1rem; top:0; font-size:.8rem; font-weight:750; }
+  .footer-bottom { display:flex; justify-content:space-between; gap:1rem; margin-top:4rem; padding-top:1rem; border-top:1px solid rgba(248,242,223,.28); font-size:.8rem; color:#b8cfc5; }
+  @media(max-width:650px){.footer-actions{align-items:start;flex-direction:column}.footer-bottom{flex-direction:column}.to-top{position:static;display:inline-block;margin-top:2rem}}
+</style>

@@ -1,0 +1,29 @@
+---
+import type { Locale } from "@/types";
+import { experiences } from "@/data/experience";
+import { profile } from "@/data/profile";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/common/PageHeader.astro";
+import ExperienceTimeline from "@/components/common/ExperienceTimeline.astro";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+
+<BaseLayout
+  {locale}
+  title={`${zh ? "经历" : "Experience"} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={zh
+    ? "科研、实习和校园项目经历。"
+    : "Research, internship, and campus project experience."}
+  ><PageHeader
+    eyebrow="Experience"
+    title={zh ? "用行动回应问题" : "Turning questions into action"}
+    description={zh
+      ? "每段经历都围绕具体问题、采取的行动与可验证的结果展开。"
+      : "Each experience is framed by a problem, the action taken, and a verifiable outcome."}
+  /><section class="section">
+    <div class="container">
+      <ExperienceTimeline items={experiences} {locale} />
+    </div>
+  </section></BaseLayout
+>

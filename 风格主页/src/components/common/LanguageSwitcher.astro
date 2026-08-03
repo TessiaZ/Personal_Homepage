@@ -1,0 +1,36 @@
+---
+import type { Locale } from "@/types";
+import { otherLocale } from "@/i18n";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const segments = Astro.url.pathname.split("/").filter(Boolean);
+segments[0] = otherLocale(locale);
+const href = `${import.meta.env.BASE_URL}${segments.join("/")}/`;
+---
+
+<a
+  class="language"
+  href={href}
+  hreflang={locale === "zh" ? "en" : "zh"}
+  aria-label={locale === "zh" ? "Switch to English" : "切换到中文"}
+  >{locale === "zh" ? "EN" : "中"}</a
+>
+<style>
+  .language {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    color: var(--color-text-primary);
+    font-size: 0.82rem;
+    font-weight: 750;
+    text-decoration: none;
+  }
+  .language:hover {
+    background: var(--color-muted);
+  }
+</style>

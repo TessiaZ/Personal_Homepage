@@ -1,0 +1,129 @@
+---
+import type { Locale } from "@/types";
+import { publications } from "@/data/publications";
+import { projects } from "@/data/projects";
+import { profile } from "@/data/profile";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PublicationItem from "@/components/common/PublicationItem.astro";
+import ProjectCard from "@/components/common/ProjectCard.astro";
+import SectionTitle from "@/components/common/SectionTitle.astro";
+import CollageImage from "@/components/visual/CollageImage.astro";
+import DecorativeAsset from "@/components/visual/DecorativeAsset.astro";
+import { visualAssets } from "@/data/visualAssets";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+
+<BaseLayout
+  {locale}
+  title={`${zh ? "科研" : "Research"} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={zh
+    ? "可信医疗 AI、计算机视觉与人机协作研究。"
+    : "Research in trustworthy medical AI, computer vision, and human–AI collaboration."}
+  ><section class="research-hero">
+    <div class="container research-hero-grid">
+      <div><p class="eyebrow">Research</p><h1>{zh ? "可信、可解释、以人为本" : "Trustworthy, interpretable, human-centered"}</h1><p class="lede">{zh ? "我的研究关注模型何时有效、为何失败，以及人如何安全地使用它。" : "My research asks when models work, why they fail, and how people can use them safely."}</p></div>
+      <div class="mri-visual reveal-on-scroll"><CollageImage asset={visualAssets.medicalMriCutout} {locale} animation="reveal" priority widths={[480,720,960]} sizes="(max-width:760px) 92vw, 43vw" /><svg viewBox="0 0 260 120" aria-hidden="true"><path d="M4 70 C52 18 88 105 138 54 S215 27 256 66"/><circle cx="52" cy="47" r="4"/><circle cx="138" cy="54" r="4"/><circle cx="222" cy="43" r="4"/></svg><DecorativeAsset asset="paperElements" size="sm" crop="center" animation="drift" class="mri-paper" /></div>
+    </div>
+  </section><section class="section">
+    <div class="container">
+      <SectionTitle title={zh ? "研究方向" : "Research interests"} /><div
+        class="interest-grid"
+      >
+        {
+          [
+            [
+              "Trustworthy Medical AI",
+              zh
+                ? "小样本学习、校准与临床可解释性"
+                : "Small-data learning, calibration, and clinical interpretability",
+            ],
+            [
+              "Human–AI Collaboration",
+              zh
+                ? "透明、可控且符合真实工作流的智能系统"
+                : "Transparent and controllable intelligent systems for real workflows",
+            ],
+            [
+              "LLM Agents",
+              zh
+                ? "可追溯检索、安全工具调用与系统评测"
+                : "Traceable retrieval, safe tool use, and system evaluation",
+            ],
+          ].map(([title, body]) => (
+            <article class="card">
+              <>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section><section class="section section-muted">
+    <div class="container">
+      <SectionTitle
+        title={zh ? "论文与在研工作" : "Publications & work in progress"}
+      /><div class="stack">
+        {
+          publications.length ? (
+            publications.map((publication) => (
+              <PublicationItem {publication} {locale} />
+            ))
+          ) : (
+            <div class="empty card">
+              {zh ? "暂无论文" : "No publications yet"}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section><section class="section">
+    <div class="container">
+      <SectionTitle title={zh ? "研究项目" : "Research projects"} /><div
+        class="grid"
+      >
+        {
+          projects
+            .filter((p) => p.type === "Research")
+            .map((project) => <ProjectCard {project} {locale} />)
+        }
+      </div>
+    </div>
+  </section></BaseLayout
+>
+<style>
+  .research-hero { padding:clamp(4rem,8vw,7rem) 0; overflow:clip; background:linear-gradient(180deg,var(--color-background),var(--color-accent-light)); border-bottom:1px solid var(--color-border); }
+  .research-hero-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(350px,.92fr); gap:clamp(2rem,6vw,6rem); align-items:center; }
+  .research-hero h1 { font-size:clamp(2.8rem,5.5vw,5.4rem); }
+  .mri-visual { position:relative; min-height:420px; }
+  .mri-visual :global(img) { position:absolute; z-index:2; inset:0; width:100%; height:100%; object-fit:contain; }
+  .mri-visual svg { position:absolute; z-index:1; inset:20% -8% auto 4%; width:104%; fill:none; stroke:var(--color-accent); stroke-width:1.2; stroke-dasharray:6 7; opacity:.45; }
+  .mri-visual circle { fill:var(--color-accent); stroke:none; animation:pulse-dot 3.8s ease-in-out infinite; }
+  .mri-paper { position:absolute; z-index:0; right:-9%; bottom:1%; opacity:.5; }
+  .interest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .interest-grid article {
+    padding: 1.4rem;
+  }
+  .interest-grid p {
+    color: var(--color-text-secondary);
+  }
+  .stack {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (max-width: 760px) {
+    .research-hero-grid { grid-template-columns:1fr; }
+    .mri-visual { min-height:330px; }
+    .mri-paper { display:none; }
+    .interest-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media(prefers-reduced-motion:reduce){.mri-visual circle{animation:none}}
+</style>

@@ -1,0 +1,114 @@
+---
+import type { Locale } from "@/types";
+import { profile } from "@/data/profile";
+import { visualAssets } from "@/data/visualAssets";
+import { local, localePath } from "@/i18n";
+import CollageImage from "@/components/visual/CollageImage.astro";
+import DecorativeAsset from "@/components/visual/DecorativeAsset.astro";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <div class="status"><span aria-hidden="true"></span>{local(profile.status, locale)}</div>
+      <p class="eyebrow">{zh ? "你好，我是" : "Hi, I’m"}</p>
+      <h1><span>TERESA</span><span>ZHANG.</span></h1>
+      <p class="chinese-name">{profile.nameZh} · {zh ? profile.roleZh : profile.roleEn}</p>
+      <p class="lede">{local(profile.intro, locale)}</p>
+      <p class="institution">{zh ? profile.universityZh : profile.universityEn} · {profile.location}</p>
+      <div class="actions">
+        <a class="button arrow-link" href={localePath(locale, "projects")}>
+          {zh ? "查看项目" : "View My Work"}<span aria-hidden="true">↗</span>
+        </a>
+        <a class="button button-secondary arrow-link" href={localePath(locale, "resume")}>
+          {zh ? "个人简历" : "Resume"}<span aria-hidden="true">↓</span>
+        </a>
+        <a class="text-link arrow-link" href={`mailto:${profile.email}`}>
+          {zh ? "和我聊聊" : "Say Hello"}<span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-label={zh ? "人物与人工智能研究拼贴" : "Student and AI research collage"}>
+      <div class="paper paper-back parallax-layer" data-depth="0.18" aria-hidden="true"></div>
+      <div class="main-parallax parallax-layer" data-depth="0.46">
+        <div class="main-collage">
+          <CollageImage asset={visualAssets.heroStudentCutout} {locale} priority animation="reveal" widths={[480, 720, 960]} sizes="(max-width: 767px) 94vw, 46vw" />
+        </div>
+      </div>
+      <span class="grid-paper parallax-layer" data-depth="0.2" aria-hidden="true"></span>
+      <span class="coral-dot" aria-hidden="true"></span>
+      <span class="tape-strip" aria-hidden="true"></span>
+      <DecorativeAsset asset="doodleElements" size="sm" crop="center" animation="rotate" class="doodle parallax-layer" position="top-right" />
+      <span class="visual-label" aria-hidden="true">AI · RESEARCH · PRODUCT</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  const heroVisual = document.querySelector<HTMLElement>(".hero-visual");
+  const finePointer = matchMedia("(min-width: 901px) and (pointer: fine)");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  if (heroVisual && finePointer.matches && !reduced.matches) {
+    const layers = [...heroVisual.querySelectorAll<HTMLElement>(".parallax-layer")];
+    let frame = 0;
+    let targetX = 0;
+    let targetY = 0;
+    const paint = () => {
+      layers.forEach((layer) => {
+        const depth = Number(layer.dataset.depth || (layer.classList.contains("doodle") ? 0.7 : 0.28));
+        layer.style.setProperty("--parallax-x", `${targetX * depth}px`);
+        layer.style.setProperty("--parallax-y", `${targetY * depth}px`);
+      });
+      frame = 0;
+    };
+    heroVisual.addEventListener("pointermove", (event) => {
+      const rect = heroVisual.getBoundingClientRect();
+      targetX = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
+      targetY = ((event.clientY - rect.top) / rect.height - 0.5) * 12;
+      if (!frame) frame = requestAnimationFrame(paint);
+    });
+    heroVisual.addEventListener("pointerleave", () => {
+      targetX = 0;
+      targetY = 0;
+      if (!frame) frame = requestAnimationFrame(paint);
+    });
+  }
+</script>
+
+<style>
+  .hero { padding: clamp(4rem, 8vw, 7rem) 0 clamp(4rem, 7vw, 6rem); overflow: clip; }
+  .hero-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(360px,.98fr); gap:clamp(2rem,5vw,5rem); align-items:center; }
+  .hero-copy { position:relative; z-index:2; min-width:0; }
+  .status { display:inline-flex; align-items:center; gap:.6rem; margin-bottom:1.4rem; padding:.38rem .72rem; border:1px solid var(--color-border); border-radius:999px; background:var(--color-surface); color:var(--color-text-secondary); font-size:.76rem; font-weight:700; letter-spacing:.035em; text-transform:uppercase; }
+  .status span { width:8px; height:8px; border-radius:50%; background:var(--color-accent); box-shadow:0 0 0 4px var(--color-accent-light); animation:pulse-dot 2.8s ease-in-out infinite; }
+  h1 { font-size:clamp(3.8rem,8vw,7.4rem); line-height:.82; letter-spacing:-.075em; }
+  h1 span { display:block; }
+  h1 span:last-child { color:var(--color-accent); }
+  .chinese-name { margin:1.35rem 0 .65rem; overflow-wrap:anywhere; color:var(--color-text-primary); font-weight:750; }
+  .lede { display:-webkit-box; max-width:58ch; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
+  .institution { color:var(--color-text-secondary); font-size:.9rem; }
+  .actions { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; margin-top:2rem; }
+  .arrow-link span { display:inline-block; transition:transform var(--motion-fast) var(--ease-standard); }
+  .arrow-link:hover span { transform:translate(4px,-1px); }
+  .text-link { display:inline-flex; gap:.35rem; padding:.6rem; font-weight:700; text-decoration:none; }
+  .hero-visual { position:relative; min-height:clamp(410px,48vw,590px); isolation:isolate; }
+  .paper-back { position:absolute; z-index:-2; inset:9% 4% 8% 8%; border-radius:48% 52% 42% 58%; background:linear-gradient(145deg,#dce9d2,#f6e7b9 72%); transform:rotate(-3deg); }
+  .main-parallax { position:absolute; z-index:2; inset:-4% -13% -4% -14%; }
+  .main-collage { width:100%; height:100%; opacity:0; transform:translateY(24px) scale(.96) rotate(1deg); animation:hero-arrive 900ms var(--ease-spring-soft) 120ms forwards; }
+  .main-collage :global(img) { width:100%; height:100%; object-fit:contain; transform:translateX(5%) scale(1.16); transform-origin:58% 58%; }
+  .grid-paper { position:absolute; z-index:-1; top:4%; left:-5%; width:38%; height:33%; border:1px solid rgba(23,107,85,.14); background-image:linear-gradient(rgba(23,107,85,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(23,107,85,.1) 1px,transparent 1px); background-size:16px 16px; clip-path:polygon(3% 6%,94% 0,100% 86%,8% 100%); transform:rotate(-4deg); }
+  .coral-dot { position:absolute; z-index:3; left:7%; top:42%; width:30px; height:30px; border-radius:50%; background:#ec705d; opacity:.86; animation:float-soft 7.4s var(--ease-standard) infinite alternate; }
+  .tape-strip { position:absolute; z-index:3; right:5%; top:14%; width:70px; height:18px; background:rgba(239,194,72,.72); transform:rotate(8deg); clip-path:polygon(3% 12%,98% 0,94% 90%,0 100%); }
+  .doodle { position:absolute; z-index:3; top:4%; right:-7%; }
+  .visual-label { position:absolute; z-index:4; right:2%; bottom:2%; padding:.38rem .65rem; border:1px solid var(--color-accent); background:#fff8e9; color:#174f40; font-size:.68rem; font-weight:850; letter-spacing:.12em; transform:rotate(-2deg); }
+  @keyframes hero-arrive { to { opacity:1; transform:translateY(0) scale(1) rotate(0); } }
+  [data-theme="dark"] .paper-back { opacity:.42; }
+  [data-theme="dark"] .paper-cluster, [data-theme="dark"] .paper-note { opacity:.58; }
+  @media (max-width:900px) { .hero-grid { grid-template-columns:1fr 1fr; gap:1rem; } .doodle,.grid-paper { display:none; } }
+  @media (max-width:720px) { .hero { padding-top:2.8rem; } .hero-grid { grid-template-columns:minmax(0,1fr); } .hero-copy>* { max-width:100%; } h1 { max-width:100%; font-size:clamp(3.2rem,17vw,5.5rem); } .chinese-name,.lede { max-width:100%; overflow-wrap:anywhere; word-break:break-word; } .hero-visual { min-height:410px; margin-top:1rem; } .main-parallax { inset:-2% -5% -2% -7%; } .main-collage :global(img) { transform:translateX(4%) scale(1.12); } .coral-dot,.tape-strip { display:none; } .lede { -webkit-line-clamp:3; } }
+  @media (max-width:440px) { .chinese-name { font-size:.92rem; } .lede { font-size:1rem; } .actions { gap:.55rem; } .text-link { flex-basis:100%; padding-left:0; } }
+  @media (prefers-reduced-motion:reduce) { .status span,.coral-dot { animation:none; } .main-collage { opacity:1; transform:none; animation:none; } }
+</style>

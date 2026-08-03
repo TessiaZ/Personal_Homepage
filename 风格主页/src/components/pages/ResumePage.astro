@@ -1,0 +1,176 @@
+---
+import type { Locale } from "@/types";
+import { profile } from "@/data/profile";
+import { experiences } from "@/data/experience";
+import { skillGroups } from "@/data/skills";
+import { publications } from "@/data/publications";
+import { local } from "@/i18n";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/common/PageHeader.astro";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+
+<BaseLayout
+  {locale}
+  title={`${zh ? "简历" : "Résumé"} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={zh
+    ? "在线简历与中英文 PDF 下载。"
+    : "Online résumé and bilingual PDF downloads."}
+  ><PageHeader
+    eyebrow="Résumé"
+    title={zh ? "简历" : "Résumé"}
+    description={zh
+      ? "适合快速浏览与打印的在线版本；PDF 文件可直接替换。"
+      : "A compact, printable overview. Replace the sample PDFs with your own."}
+  /><section class="section">
+    <div class="container resume-actions">
+      <a
+        class="button"
+        href={`${import.meta.env.BASE_URL}resume/resume-zh.pdf`}
+        download>中文 PDF ↓</a
+      ><a
+        class="button button-secondary"
+        href={`${import.meta.env.BASE_URL}resume/resume-en.pdf`}
+        download>English PDF ↓</a
+      ><button
+        class="button button-secondary"
+        type="button"
+        onclick="window.print()">{zh ? "打印本页" : "Print this page"}</button
+      ><span
+        >{zh ? "最后更新：2026 年 8 月" : "Last updated: August 2026"}</span>
+    </div><article class="resume card">
+      <header>
+        <div>
+          <h2>{zh ? profile.nameZh : profile.nameEn}</h2><p>
+            {zh ? profile.roleZh : profile.roleEn}
+          </p>
+        </div><a href={`mailto:${profile.email}`}>{profile.email}</a>
+      </header><section>
+        <h3>{zh ? "教育" : "Education"}</h3><p>
+          <strong>{zh ? profile.universityZh : profile.universityEn}</strong> · {
+            zh
+              ? "人工智能学士，2023—2027（预计）"
+              : "B.Eng. Artificial Intelligence, 2023–2027 (expected)"
+          }
+        </p>
+      </section><section>
+        <h3>{zh ? "经历" : "Experience"}</h3>{
+          experiences.map((e) => (
+            <div class="resume-item">
+              <>
+                <p>
+                  <>
+                    <strong>
+                      {local(e.role, locale)} · {local(e.organization, locale)}
+                    </strong>
+                    <span>{e.period}</span>
+                  </>
+                </p>
+                <ul>
+                  {e.achievements.map((a) => (
+                    <li>{local(a, locale)}</li>
+                  ))}
+                </ul>
+              </>
+            </div>
+          ))
+        }
+      </section><section>
+        <h3>{zh ? "研究成果" : "Research"}</h3>{
+          publications.map((p) => (
+            <p>
+              <>
+                <strong>{p.title}</strong>
+                <br />
+                <span>
+                  {p.venue} · {p.year} · {p.status}
+                </span>
+              </>
+            </p>
+          ))
+        }
+      </section><section>
+        <h3>{zh ? "技能" : "Skills"}</h3>{
+          skillGroups.map((g) => (
+            <p>
+              <strong>{g.name}:</strong> {g.skills.join(" · ")}
+            </p>
+          ))
+        }
+      </section>
+    </article>
+  </section></BaseLayout
+>
+<style>
+  .resume-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.3rem;
+  }
+  .resume-actions span {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    margin-left: auto;
+  }
+  .resume {
+    max-width: 900px;
+    margin: auto;
+    padding: clamp(1.5rem, 4vw, 3.5rem);
+  }
+  .resume header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-text-primary);
+  }
+  .resume section {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .resume section h3 {
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.9rem;
+  }
+  .resume-item > p {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .resume-item span,
+  .resume section > p span {
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 600px) {
+    .resume header,
+    .resume-item > p {
+      flex-direction: column;
+    }
+    .resume-actions span {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+  @media print {
+    .site-header,
+    footer,
+    .back-top,
+    .page-header,
+    .resume-actions {
+      display: none !important;
+    }
+    .section {
+      padding: 0;
+    }
+    .resume {
+      box-shadow: none;
+      border: 0;
+      max-width: none;
+    }
+  }
+</style>

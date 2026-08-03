@@ -1,0 +1,6 @@
+import type { Publication } from '@/types';
+
+export const publications: Publication[] = [
+  { title: 'Calibration-Aware Learning for Small-Scale MRI Classification', authors: ['Qinghe Zhang', 'Lin Chen', 'Ming Xu'], venue: 'International Workshop on Trustworthy Medical AI', year: 2026, status: 'Under Review', summary: { zh: '研究小样本、不均衡 MRI 分类中的置信度偏差，结合校准损失与分层验证提高稳定性。', en: 'Studies confidence bias in small, imbalanced MRI datasets, combining calibration loss with stratified validation.' }, contribution: { zh: '共同一作；负责实验设计、实现、误差分析与初稿。', en: 'Co-first author; designed experiments, implemented models, analyzed errors, and drafted the paper.' }, links: { paper: 'https://example.com', github: 'https://github.com/' } },
+  { title: 'Traceable Campus Agents with Constrained Tool Use', authors: ['Qinghe Zhang', 'Yue Li'], venue: 'arXiv preprint', year: 2026, status: 'Preprint', summary: { zh: '提出面向校园服务的可追溯 Agent 原型，通过引用覆盖率和操作安全性评测回答质量。', en: 'Presents a traceable campus agent evaluated on citation coverage and operational safety.' }, contribution: { zh: '第一作者；负责系统设计、评测集构建与用户研究。', en: 'First author; led system design, evaluation-set construction, and user research.' }, links: { paper: 'https://example.com', project: 'https://example.com' } }
+];

@@ -1,0 +1,151 @@
+---
+import type { Locale } from "@/types";
+import { projects } from "@/data/projects";
+import { profile } from "@/data/profile";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/common/PageHeader.astro";
+import ProjectCard from "@/components/common/ProjectCard.astro";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+const types = ["All", ...new Set(projects.map((p) => p.type))];
+---
+
+<BaseLayout
+  {locale}
+  title={`${zh ? "项目" : "Projects"} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={zh
+    ? "研究、工程和产品项目，强调问题、过程与个人贡献。"
+    : "Research, engineering, and product work with context, process, and contribution."}
+  ><PageHeader
+    eyebrow="Projects"
+    title={zh ? "从问题到可验证的结果" : "From questions to testable outcomes"}
+    description={zh
+      ? "这里不只列技术栈，也记录每个项目为何存在、如何取舍，以及我具体做了什么。"
+      : "More than technology lists: why each project exists, the trade-offs made, and what I contributed."}
+  /><section class="section">
+    <div class="container">
+      <div class="filters" aria-label={zh ? "项目筛选" : "Project filters"}>
+        <label
+          ><span class="sr-only">{zh ? "搜索项目" : "Search projects"}</span
+          ><input
+            id="project-search"
+            type="search"
+            placeholder={zh ? "搜索项目或技术…" : "Search projects or skills…"}
+          /></label
+        ><div class="filter-buttons">
+          {
+            types.map((type, i) => (
+              <button
+                type="button"
+                class:list={[i === 0 && "active"]}
+                data-filter={type}
+              >
+                {type === "All" ? (zh ? "全部" : "All") : type}
+              </button>
+            ))
+          }
+        </div>
+      </div><p id="project-count" class="count" aria-live="polite"></p><div
+        id="project-grid"
+        class="grid"
+      >
+        {
+          projects
+            .sort(
+              (a, b) =>
+                Number(b.featured) - Number(a.featured) || b.year - a.year,
+            )
+            .map((project) => <ProjectCard {project} {locale} />)
+        }
+      </div><div id="project-empty" class="empty card" hidden>
+        {
+          zh
+            ? "没有匹配的项目，请尝试其他关键词。"
+            : "No matching projects. Try another search."
+        }
+      </div>
+    </div>
+  </section></BaseLayout
+>
+<script>
+  const search = document.querySelector<HTMLInputElement>("#project-search");
+  const buttons = [
+    ...document.querySelectorAll<HTMLButtonElement>("[data-filter]"),
+  ];
+  const cards = [...document.querySelectorAll<HTMLElement>(".project-card")];
+  const empty = document.querySelector<HTMLElement>("#project-empty");
+  const count = document.querySelector<HTMLElement>("#project-count");
+  let filter = "All";
+  const update = () => {
+    const q = (search?.value ?? "").trim().toLowerCase();
+    let visible = 0;
+    cards.forEach((card) => {
+      const show =
+        (filter === "All" || card.dataset.type === filter) &&
+        (!q || (card.dataset.search ?? "").includes(q));
+      card.hidden = !show;
+      if (show) visible++;
+    });
+    if (empty) empty.hidden = visible > 0;
+    if (count) count.textContent = `${visible} / ${cards.length}`;
+  };
+  search?.addEventListener("input", update);
+  buttons.forEach((btn) =>
+    btn.addEventListener("click", () => {
+      filter = btn.dataset.filter ?? "All";
+      buttons.forEach((b) => b.classList.toggle("active", b === btn));
+      update();
+    }),
+  );
+  update();
+</script>
+<style>
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .filters input {
+    width: min(320px, 100%);
+    min-height: 44px;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+  .filter-buttons {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+  .filter-buttons button {
+    min-height: 40px;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+  .filter-buttons button.active {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+  .count {
+    margin: 0 0 1rem;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+  }
+  @media (max-width: 800px) {
+    .filters {
+      flex-direction: column;
+    }
+    .filters input {
+      width: 100%;
+    }
+  }
+</style>

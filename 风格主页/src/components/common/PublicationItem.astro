@@ -1,0 +1,70 @@
+---
+import type { Locale, Publication } from "@/types";
+import { local } from "@/i18n";
+const { publication, locale } = Astro.props as {
+  publication: Publication;
+  locale: Locale;
+};
+---
+
+<article class="publication card">
+  <div class="pub-main">
+    <div class="meta">
+      <span class="tag">{publication.status}</span><span
+        >{publication.year} · {publication.venue}</span>
+    </div><h3>{publication.title}</h3><p class="authors">
+      {publication.authors.join(", ")}
+    </p><p>{local(publication.summary, locale)}</p><p class="contribution">
+      <strong>{locale === "zh" ? "个人贡献：" : "Contribution: "}</strong>{
+        local(publication.contribution, locale)
+      }
+    </p>
+  </div><div class="pub-links">
+    {publication.links.paper && <a href={publication.links.paper}>Paper</a>}{
+      publication.links.github && <a href={publication.links.github}>Code</a>
+    }{
+      publication.links.project && (
+        <a href={publication.links.project}>Project</a>
+      )
+    }
+  </div>
+</article>
+<style>
+  .publication {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .meta {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+  }
+  .publication h3 {
+    margin: 0.7rem 0;
+  }
+  .authors,
+  .publication > div > p {
+    color: var(--color-text-secondary);
+  }
+  .contribution {
+    font-size: 0.9rem;
+  }
+  .pub-links {
+    display: flex;
+    gap: 0.8rem;
+    align-items: start;
+    white-space: nowrap;
+  }
+  @media (max-width: 700px) {
+    .publication {
+      flex-direction: column;
+    }
+    .pub-links {
+      flex-wrap: wrap;
+    }
+  }
+</style>

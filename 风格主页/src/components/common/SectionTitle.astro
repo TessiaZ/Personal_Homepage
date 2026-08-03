@@ -1,0 +1,28 @@
+---
+interface Props { eyebrow?: string; title: string; description?: string; href?: string; linkLabel?: string; }
+const { eyebrow, title, description, href, linkLabel } = Astro.props;
+const number = eyebrow?.match(/^\d+/)?.[0];
+const label = eyebrow?.replace(/^\d+\s*\/\s*/, "");
+const variant = Number(number || 0) % 3;
+---
+<div class="section-head" data-decoration={variant}>
+  <div class="heading-copy">
+    {eyebrow && <div class="editorial-kicker">{number && <strong>{number}</strong>}<span>{label || eyebrow}</span></div>}
+    <h2>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+  <span class="heading-mark" aria-hidden="true"></span>
+  {href && <a class="heading-link" href={href}>{linkLabel} <span aria-hidden="true">→</span></a>}
+</div>
+<style>
+  .section-head { position:relative; }
+  .editorial-kicker { display:flex; align-items:center; gap:.7rem; margin-bottom:.45rem; color:var(--color-accent); font-size:.73rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+  .editorial-kicker strong { display:grid; place-items:center; width:2.3rem; height:2.3rem; border:1px solid var(--color-accent); border-radius:50% 44% 52% 46%; font-size:.78rem; transform:rotate(-4deg); }
+  .heading-mark { position:absolute; left:min(48%,520px); top:.9rem; width:52px; height:16px; border-top:2px solid var(--color-accent); transform:rotate(-5deg); opacity:.7; }
+  [data-decoration="1"] .heading-mark { border-top:0; width:12px; height:12px; border-radius:50%; background:#ec705d; }
+  [data-decoration="2"] .heading-mark { width:18px; height:18px; border:0; background:#e8b83d; clip-path:polygon(50% 0,62% 37%,100% 50%,62% 63%,50% 100%,38% 63%,0 50%,38% 37%); }
+  .heading-link { font-weight:750; text-decoration:none; }
+  .heading-link span { display:inline-block; transition:transform var(--motion-fast); }
+  .heading-link:hover span { transform:translateX(4px); }
+  @media(max-width:767px){.heading-mark{right:0;left:auto;}}
+</style>

@@ -1,0 +1,47 @@
+---
+import type { Locale, Post } from "@/types";
+import { local, localePath } from "@/i18n";
+const { post, locale } = Astro.props as { post: Post; locale: Locale };
+---
+
+<article class="blog-card card">
+  <p class="meta">
+    {
+      new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
+        dateStyle: "medium",
+      }).format(new Date(post.date))
+    } · {post.readingTime} min
+  </p><h3>
+    <a href={localePath(locale, `blog/${post.slug}`)}
+      >{local(post.title, locale)}</a>
+  </h3><p>{local(post.excerpt, locale)}</p><div>
+    {post.tags.map((tag) => <span class="tag">{tag}</span>)}
+  </div>
+</article>
+<style>
+  .blog-card {
+    grid-column: span 4;
+    padding: 1.35rem;
+  }
+  .meta {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+  .blog-card h3 a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+  .blog-card > p:not(.meta) {
+    color: var(--color-text-secondary);
+  }
+  .blog-card div {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 800px) {
+    .blog-card {
+      grid-column: 1/-1;
+    }
+  }
+</style>

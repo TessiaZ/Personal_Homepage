@@ -1,0 +1,47 @@
+---
+import { profile } from "@/data/profile";
+const links = [
+  ["Email", `mailto:${profile.email}`],
+  ["GitHub", profile.github],
+  ["LinkedIn", profile.linkedin],
+  ["Google Scholar", profile.scholar],
+  ["ORCID", profile.orcid],
+];
+---
+
+<div class="social-links">
+  {
+    links
+      .filter(([, url]) => url)
+      .map(([label, url]) => (
+        <a class="card" href={url}>
+          {label}
+          <span aria-hidden="true">↗</span>
+        </a>
+      ))
+  }
+</div>
+<style>
+  .social-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .social-links a {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    color: var(--color-text-primary);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .social-links a:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  @media (max-width: 500px) {
+    .social-links {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

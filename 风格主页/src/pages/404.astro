@@ -1,0 +1,17 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  locale="zh"
+  title="页面未找到 · Page not found"
+  description="The requested page does not exist."
+  ><section class="section">
+    <div class="narrow empty card">
+      <p class="eyebrow">404</p><h1>页面未找到</h1><p class="lede">
+        The requested page does not exist.
+      </p><a class="button" href={`${import.meta.env.BASE_URL}zh/`}
+        >返回首页 / Home</a>
+    </div>
+  </section></BaseLayout
+>

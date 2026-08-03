@@ -1,0 +1,155 @@
+---
+import type { Locale, Post } from "@/types";
+import { local, localePath } from "@/i18n";
+import { posts } from "@/data/posts";
+import { profile } from "@/data/profile";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+const { locale, post } = Astro.props as { locale: Locale; post: Post };
+const zh = locale === "zh";
+const index = posts.findIndex((p) => p.slug === post.slug);
+const prev = posts[index - 1];
+const next = posts[index + 1];
+const escape = (s: string) =>
+  s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+const render = (md: string) => {
+  const lines = md.split("\n");
+  let html = "";
+  let inCode = false;
+  for (const raw of lines) {
+    if (raw.startsWith("```")) {
+      html += inCode
+        ? "</code></pre>"
+        : `<pre><code class="language-${raw.slice(3)}">`;
+      inCode = !inCode;
+      continue;
+    }
+    if (inCode) {
+      html += `${escape(raw)}\n`;
+      continue;
+    }
+    if (raw.startsWith("## ")) {
+      html += `<h2>${escape(raw.slice(3))}</h2>`;
+    } else if (raw.trim()) {
+      html += `<p>${escape(raw)}</p>`;
+    }
+  }
+  return html;
+};
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: local(post.title, locale),
+  description: local(post.excerpt, locale),
+  datePublished: post.date,
+  author: { "@type": "Person", name: zh ? profile.nameZh : profile.nameEn },
+};
+---
+
+<BaseLayout
+  {locale}
+  title={`${local(post.title, locale)} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={local(post.excerpt, locale)}
+  type="article"
+  {jsonLd}
+  ><article>
+    <header class="article-head narrow">
+      <a href={localePath(locale, "blog")}
+        >← {zh ? "返回文章" : "Back to writing"}</a
+      ><p class="eyebrow">{post.category}</p><h1>
+        {local(post.title, locale)}
+      </h1><p class="lede">{local(post.excerpt, locale)}</p><div class="meta">
+        <time datetime={post.date}
+          >{
+            new Intl.DateTimeFormat(zh ? "zh-CN" : "en-US", {
+              dateStyle: "long",
+            }).format(new Date(post.date))
+          }</time
+        ><span>·</span><span>{post.readingTime} min read</span>
+      </div>
+    </header><div
+      class="narrow prose article-body"
+      set:html={render(local(post.content, locale))}
+    /><nav
+      class="narrow post-nav"
+      aria-label={zh ? "文章翻页" : "Post pagination"}
+    >
+      <div>
+        {
+          prev && (
+            <>
+              <>
+                <small>{zh ? "上一篇" : "Previous"}</small>
+                <a href={localePath(locale, `blog/${prev.slug}`)}>
+                  {local(prev.title, locale)}
+                </a>
+              </>
+            </>
+          )
+        }
+      </div><div>
+        {
+          next && (
+            <>
+              <>
+                <small>{zh ? "下一篇" : "Next"}</small>
+                <a href={localePath(locale, `blog/${next.slug}`)}>
+                  {local(next.title, locale)}
+                </a>
+              </>
+            </>
+          )
+        }
+      </div>
+    </nav>
+  </article></BaseLayout
+>
+<style>
+  .article-head {
+    padding: 5rem 0 2.5rem;
+  }
+  .article-head > a {
+    display: inline-block;
+    margin-bottom: 3rem;
+  }
+  .article-head h1 {
+    font-size: clamp(2.3rem, 5vw, 4.1rem);
+    margin: 0.8rem 0;
+  }
+  .meta {
+    display: flex;
+    gap: 0.6rem;
+    color: var(--color-text-secondary);
+    font-size: 0.86rem;
+  }
+  .article-body {
+    padding-bottom: 5rem;
+  }
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem 0 5rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .post-nav div:last-child {
+    text-align: right;
+  }
+  .post-nav small,
+  .post-nav a {
+    display: block;
+  }
+  .post-nav small {
+    color: var(--color-text-secondary);
+  }
+  .post-nav a {
+    font-weight: 700;
+  }
+  @media (max-width: 600px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .post-nav div:last-child {
+      text-align: left;
+    }
+  }
+</style>

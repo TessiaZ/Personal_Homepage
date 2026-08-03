@@ -1,0 +1,220 @@
+---
+import type { Locale } from "@/types";
+import { siteConfig } from "@/config/site";
+import { projects } from "@/data/projects";
+import { publications } from "@/data/publications";
+import { experiences } from "@/data/experience";
+import { skillGroups } from "@/data/skills";
+import { posts } from "@/data/posts";
+import { profile } from "@/data/profile";
+import { t, localePath } from "@/i18n";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import HeroSection from "./HeroSection.astro";
+import SectionTitle from "@/components/common/SectionTitle.astro";
+import ProjectCard from "@/components/common/ProjectCard.astro";
+import PublicationItem from "@/components/common/PublicationItem.astro";
+import ExperienceTimeline from "@/components/common/ExperienceTimeline.astro";
+import SkillGroup from "@/components/common/SkillGroup.astro";
+import BlogCard from "@/components/common/BlogCard.astro";
+import CollageImage from "@/components/visual/CollageImage.astro";
+import ImageReveal from "@/components/visual/ImageReveal.astro";
+import { visualAssets } from "@/data/visualAssets";
+const { locale } = Astro.props as { locale: Locale };
+const copy = t(locale);
+const name = locale === "zh" ? profile.nameZh : profile.nameEn;
+---
+
+<BaseLayout
+  {locale}
+  title={`${name} · ${locale === "zh" ? "研究与工程作品集" : "Research & Engineering Portfolio"}`}
+  description={locale === "zh" ? profile.intro.zh : profile.intro.en}
+>
+  <HeroSection {locale} />
+  <div class={`home-sections mode-${siteConfig.mode}`}>
+    <section class="section section-muted">
+      <div class="container">
+        <SectionTitle
+          eyebrow="01 / Projects"
+          title={copy.selectedProjects}
+          href={localePath(locale, "projects")}
+          linkLabel={locale === "zh" ? "全部项目" : "All projects"}
+        /><div class="grid">
+          {
+            projects
+              .filter((p) => p.featured)
+              .slice(0, 3)
+              .map((p) => <ProjectCard project={p} {locale} highlight={p.slug === "campus-agent"} />)
+          }
+        </div>
+      </div>
+    </section>
+    {
+      siteConfig.showPublications && (
+        <section class="section">
+          <div class="container">
+            <>
+              <SectionTitle
+                eyebrow="02 / Research"
+                title={copy.research}
+                href={localePath(locale, "research")}
+                linkLabel={locale === "zh" ? "全部成果" : "All research"}
+              />
+              <div class="research-preview">
+                <div class="stack">
+                  {publications.slice(0, 2).map((p) => (
+                    <PublicationItem publication={p} {locale} />
+                  ))}
+                </div>
+                <ImageReveal class="research-collage" delay={100}>
+                  <CollageImage asset={visualAssets.computerContactCutout} {locale} animation="reveal" widths={[420, 720]} sizes="(max-width: 760px) 92vw, 35vw" />
+                </ImageReveal>
+              </div>
+            </>
+          </div>
+        </section>
+      )
+    }
+    {
+      siteConfig.showExperience && (
+        <section class="section section-muted">
+          <div class="container">
+            <>
+              <SectionTitle
+                eyebrow="03 / Experience"
+                title={copy.experience}
+                href={localePath(locale, "experience")}
+                linkLabel={locale === "zh" ? "完整经历" : "Full timeline"}
+              />
+              <ExperienceTimeline items={experiences.slice(0, 2)} {locale} />
+            </>
+          </div>
+        </section>
+      )
+    }
+    {
+      siteConfig.showSkills && (
+        <section class="section">
+          <div class="container">
+            <>
+              <SectionTitle eyebrow="04 / Toolkit" title={copy.skills} />
+              <div class="grid">
+                {skillGroups.map((g) => (
+                  <SkillGroup {...g} />
+                ))}
+              </div>
+            </>
+          </div>
+        </section>
+      )
+    }
+    {
+      siteConfig.showBlog && (
+        <section class="section section-muted">
+          <div class="container">
+            <>
+              <SectionTitle
+                eyebrow="05 / Writing"
+                title={copy.posts}
+                href={localePath(locale, "blog")}
+                linkLabel={locale === "zh" ? "全部文章" : "All writing"}
+              />
+              <div class="grid">
+                {posts.slice(0, 3).map((post) => (
+                  <BlogCard {post} {locale} />
+                ))}
+              </div>
+            </>
+          </div>
+        </section>
+      )
+    }
+    {
+      siteConfig.showContact && (
+        <section class="section">
+          <div class="container contact">
+            <>
+              <p class="eyebrow">06 / Contact</p>
+              <h2>
+                {locale === "zh"
+                  ? "一起研究真实问题，构建可靠产品。"
+                  : "Let’s study real problems and build reliable products."}
+              </h2>
+              <p class="lede">
+                {locale === "zh"
+                  ? "欢迎就科研合作、实习机会、开源项目和人工智能应用进行交流。"
+                  : "I am open to research collaboration, internships, open-source projects, and conversations about AI applications."}
+              </p>
+              <a class="button" href={`mailto:${profile.email}`}>
+                {copy.contact} ↗
+              </a>
+            </>
+          </div>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+<style>
+  .home-sections {
+    display: flex;
+    flex-direction: column;
+  }
+  .mode-academic > section:nth-child(2) {
+    order: 0;
+  }
+  .mode-academic > section:nth-child(1) {
+    order: 2;
+  }
+  .mode-academic > section:nth-child(3) {
+    order: 4;
+  }
+  .mode-academic > section:nth-child(n + 4) {
+    order: 50;
+  }
+  .mode-career > section:nth-child(1) {
+    order: 0;
+  }
+  .mode-career > section:nth-child(3) {
+    order: 1;
+  }
+  .mode-career > section:nth-child(4) {
+    order: 2;
+  }
+  .mode-career > section:nth-child(6) {
+    order: 4;
+  }
+  .mode-career > section:nth-child(2),
+  .mode-career > section:nth-child(5) {
+    order: 50;
+  }
+  .mode-hybrid > section:nth-child(1) {
+    order: 1;
+  }
+  .mode-hybrid > section:nth-child(2) {
+    order: 2;
+  }
+  .mode-hybrid > section:nth-child(3) {
+    order: 3;
+  }
+  .mode-hybrid > section:nth-child(5) {
+    order: 4;
+  }
+  .mode-hybrid > section:nth-child(4),
+  .mode-hybrid > section:nth-child(6) {
+    order: 50;
+  }
+  .stack {
+    display: grid;
+    gap: 1rem;
+  }
+  .research-preview { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:clamp(2rem,5vw,4rem); align-items:center; }
+  .research-collage { position:relative; min-height:320px; }
+  .research-collage :global(img) { width:100%; height:100%; object-fit:contain; }
+  .contact {
+    max-width: 850px;
+  }
+  .contact .button {
+    margin-top: 1.2rem;
+  }
+  @media(max-width:760px){.research-preview{grid-template-columns:1fr}.research-collage{min-height:280px;order:-1}}
+</style>

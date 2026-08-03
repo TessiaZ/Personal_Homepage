@@ -1,0 +1,12 @@
+---
+interface Props { class?: string; delay?: number; }
+const { class: className, delay = 0 } = Astro.props;
+---
+<div class:list={["image-reveal", "reveal-on-scroll", className]} style={`--reveal-delay:${delay}ms`}>
+  <slot />
+</div>
+<style>
+  .image-reveal { overflow: hidden; }
+  .image-reveal :global(img) { transition: transform var(--motion-slow) var(--ease-spring-soft); }
+  .image-reveal:hover :global(img) { transform: scale(1.018); }
+</style>

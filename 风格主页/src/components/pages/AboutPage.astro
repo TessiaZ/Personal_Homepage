@@ -1,0 +1,141 @@
+---
+import type { Locale } from "@/types";
+import { profile, education } from "@/data/profile";
+import { local } from "@/i18n";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/common/PageHeader.astro";
+import SectionTitle from "@/components/common/SectionTitle.astro";
+import CollageImage from "@/components/visual/CollageImage.astro";
+import DecorativeAsset from "@/components/visual/DecorativeAsset.astro";
+import ImageReveal from "@/components/visual/ImageReveal.astro";
+import { visualAssets } from "@/data/visualAssets";
+const { locale } = Astro.props as { locale: Locale };
+const zh = locale === "zh";
+---
+
+<BaseLayout
+  {locale}
+  title={`${zh ? "关于" : "About"} · ${zh ? profile.nameZh : profile.nameEn}`}
+  description={local(profile.bio, locale)}
+  ><PageHeader
+    eyebrow="About"
+    title={zh
+      ? "从好奇出发，以证据抵达。"
+      : "Curiosity first. Evidence always."}
+    description={zh
+      ? "我关心技术为何有用、为谁有用，以及怎样让它在真实环境中可靠工作。"
+      : "I care about why technology helps, whom it serves, and how it can work reliably in the real world."}
+  /><section class="section">
+    <div class="container about-grid">
+      <article class="prose">
+        <h2>{zh ? "不只是简历" : "Beyond the résumé"}</h2><p>
+          {local(profile.bio, locale)}
+        </p><h2>{zh ? "我关注的问题" : "Questions I care about"}</h2><p>
+          {
+            zh
+              ? "如何让医学人工智能在数据有限时仍然可信？如何让智能体在执行真实操作时保持透明和可控？如何把研究结论转化为普通人可以理解、可以使用的体验？这些问题连接了我的研究、工程与产品实践。"
+              : "How can medical AI remain trustworthy with limited data? How can agents stay transparent and controllable when acting in the world? How do research findings become experiences people can understand and use? These questions connect my research, engineering, and product work."
+          }
+        </p><h2>{zh ? "长期方向" : "Long-term direction"}</h2><p>
+          {
+            zh
+              ? "继续深造可信 AI 与人机协作方向，同时在开放研究、技术写作和公共工具中持续贡献。"
+              : "Pursue graduate work in trustworthy AI and human–AI collaboration while contributing through open research, technical writing, and public tools."
+          }
+        </p>
+      </article><aside>
+        <ImageReveal class="about-editorial"><CollageImage asset={visualAssets.heroStudentEditorial} {locale} animation="reveal" widths={[360,640]} sizes="(max-width:760px) 92vw, 28vw" /></ImageReveal>
+        <p class="eyebrow">Timeline</p><ol class="education">
+          {
+            education.map((item) => (
+              <li>
+                <>
+                  <span>{item.year}</span>
+                  <p>{item[locale]}</p>
+                </>
+              </li>
+            ))
+          }
+        </ol>
+      </aside>
+    </div>
+  </section><section class="section section-muted beyond">
+    <div class="container">
+      <SectionTitle eyebrow="02 / Lookbook" title={zh ? "简历之外" : "Beyond the résumé"} description={zh ? "实验室之外的观察，也在塑造我如何理解技术与人。" : "Observations beyond the lab also shape how I understand technology and people."} />
+      <div class="lookbook-grid">
+        <div class="lookbook-visual">
+          <ImageReveal class="editorial-photo"><CollageImage asset={visualAssets.lookbookEditorial} {locale} animation="reveal" widths={[520,800,1080]} sizes="(max-width:760px) 92vw, 48vw" /></ImageReveal>
+          <div class="lookbook-cutout reveal-on-scroll"><CollageImage asset={visualAssets.lookbookCutout} {locale} animation="none" widths={[360,640]} sizes="260px" /></div>
+          <DecorativeAsset asset="doodleElements" size="sm" crop="left" animation="rotate" class="lookbook-arrow" />
+        </div>
+        <div class="lookbook-notes">
+          {[
+            ["CURRENTLY EXPLORING", zh ? "手机端个性化 AI 与跨 App 工作流" : "Personalized mobile AI and cross-app workflows"],
+            ["HOW I LEARN", zh ? "通过课程、项目和真实问题不断验证想法" : "Testing ideas through courses, projects, and real problems"],
+            ["OUTSIDE THE LAB", zh ? "摄影、散步、旅行与观察真实用户" : "Photography, walking, travel, and observing real users"],
+          ].map(([title,body],index)=><article class="reveal-on-scroll" style={`--reveal-delay:${index*90}ms`}><span>{String(index+1).padStart(2,"0")}</span><h3>{title}</h3><p>{body}</p></article>)}
+        </div>
+      </div>
+    </div>
+  </section></BaseLayout
+>
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+    gap: clamp(3rem, 8vw, 7rem);
+  }
+  .prose h2:first-child {
+    margin-top: 0;
+  }
+  .education {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    border-left: 1px solid var(--color-border);
+  }
+  .about-editorial { margin-bottom:2rem; border:8px solid var(--color-surface); transform:rotate(1.5deg); box-shadow:var(--shadow); }
+  .education li {
+    position: relative;
+    padding: 0 0 1.6rem 1.6rem;
+  }
+  .education li:before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 0.45rem;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .education span {
+    font-weight: 800;
+    color: var(--color-accent);
+  }
+  .education p {
+    color: var(--color-text-secondary);
+  }
+  .beyond { overflow:clip; }
+  .lookbook-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(300px,.75fr); gap:clamp(2.5rem,7vw,6rem); align-items:center; }
+  .lookbook-visual { position:relative; min-height:500px; }
+  .editorial-photo { position:absolute; inset:0 8% 11% 0; border:10px solid var(--color-surface); transform:rotate(-1.5deg); box-shadow:var(--shadow); }
+  .editorial-photo :global(img) { width:100%; height:100%; object-fit:cover; }
+  .lookbook-cutout { position:absolute; right:-3%; bottom:0; width:52%; transform:rotate(3deg); }
+  .lookbook-cutout:hover { transform:rotate(0); }
+  .lookbook-arrow { position:absolute; top:-7%; right:-3%; }
+  .lookbook-notes { display:grid; gap:1rem; }
+  .lookbook-notes article { position:relative; padding:1.25rem 1.25rem 1.25rem 3.4rem; border-bottom:1px solid var(--color-border); }
+  .lookbook-notes span { position:absolute; left:0; top:1.15rem; color:var(--color-accent); font-size:1.4rem; font-weight:850; }
+  .lookbook-notes h3 { font-size:.78rem; letter-spacing:.12em; }
+  .lookbook-notes p { color:var(--color-text-secondary); }
+  @media (max-width: 760px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+    .lookbook-grid { grid-template-columns:1fr; }
+    .lookbook-visual { min-height:420px; }
+    .lookbook-cutout { width:56%; right:0; }
+    .lookbook-arrow { display:none; }
+  }
+</style>

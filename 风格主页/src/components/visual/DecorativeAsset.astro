@@ -1,0 +1,60 @@
+---
+import CollageImage from "./CollageImage.astro";
+import { visualAssets, type VisualAssetKey } from "@/data/visualAssets";
+
+interface Props {
+  asset: VisualAssetKey;
+  size?: "sm" | "md" | "lg";
+  animation?: "none" | "float" | "drift" | "rotate";
+  position?: string;
+  crop?: "full" | "left" | "center" | "right";
+  class?: string;
+  ariaHidden?: boolean;
+}
+const {
+  asset,
+  size = "md",
+  animation = "none",
+  position,
+  crop = "full",
+  class: className,
+  ariaHidden = true,
+} = Astro.props;
+const visual = visualAssets[asset];
+---
+
+<span
+  class:list={[
+    "decorative-asset",
+    `size-${size}`,
+    `animation-${animation}`,
+    `crop-${crop}`,
+    className,
+  ]}
+  data-position={position}
+  aria-hidden={ariaHidden ? "true" : undefined}
+>
+  <CollageImage asset={visual} decorative={ariaHidden} animation="none" widths={[320, 640]} sizes="320px" />
+</span>
+
+<style>
+  .decorative-asset {
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+  .size-sm { width: clamp(90px, 11vw, 150px); }
+  .size-md { width: clamp(150px, 18vw, 250px); }
+  .size-lg { width: clamp(240px, 30vw, 420px); }
+  .crop-left :global(img), .crop-center :global(img), .crop-right :global(img) {
+    width: 250%;
+    max-width: none;
+  }
+  .crop-left :global(img) { transform: translateX(0); }
+  .crop-center :global(img) { transform: translateX(-30%); }
+  .crop-right :global(img) { transform: translateX(-60%); }
+  .animation-float { animation: float-soft 8.4s var(--ease-standard) infinite alternate; }
+  .animation-drift { animation: drift-horizontal 10s var(--ease-standard) infinite alternate; }
+  .animation-rotate { animation: rotate-soft 9s var(--ease-standard) infinite alternate; }
+</style>
